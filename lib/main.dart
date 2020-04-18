@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:technewsfeeder/newslist_screen.dart';
+import 'package:technewsfeeder/webview_screen.dart';
 
 void main() {
   runApp(TechNewsFeeder());
@@ -17,6 +18,7 @@ class TechNewsFeeder extends StatelessWidget {
       initialRoute: NewsListScreen.id,
       routes: {
         NewsListScreen.id: (context) => NewsListScreen(),
+        WebViewScreen.id: (context) => WebViewScreen(),
       },
     );
   }

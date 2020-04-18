@@ -3,6 +3,8 @@ import 'package:http/http.dart' as http;
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:technewsfeeder/webview_screen.dart';
+
 class NewsListScreen extends StatefulWidget {
   // "static const" is always as this value.
   static const String id = 'newslist_screen';
@@ -66,7 +68,14 @@ class _NewsListScreenState extends State<NewsListScreen> {
                     width: 100.0,
                   ),
                 ),
-                onTap: () {},
+                onTap: () {
+                  print(article[position].url);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => WebViewScreen(url: article[position].url)),
+                  );
+                },
               ),
             );
           }),
