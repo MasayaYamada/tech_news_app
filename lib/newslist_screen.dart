@@ -1,15 +1,14 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'dart:async';
-import 'dart:convert';
 
 import 'package:technewsfeeder/webview_screen.dart';
+import 'package:technewsfeeder/fetch_newsdata.dart';
+import 'package:technewsfeeder/favorite_screen.dart';
+import 'package:technewsfeeder/footer.dart';
 
 class NewsListScreen extends StatefulWidget {
   // "static const" is always as this value.
   static const String id = 'newslist_screen';
-
-  String get newsType => null;
 
   @override
   _NewsListScreenState createState() => _NewsListScreenState();
@@ -17,7 +16,8 @@ class NewsListScreen extends StatefulWidget {
 
 class _NewsListScreenState extends State<NewsListScreen> {
 
-  Future<NewsDataList> dataList;
+  int _selectedIndex;
+  List<bool> _isFavorite = List.generate(20, (i)=>false);
 
   // Animation controller init method
   @override
@@ -32,12 +32,13 @@ class _NewsListScreenState extends State<NewsListScreen> {
           title: Text('Tech News App'),
         ),
       body: FutureBuilder(
-          future: fetchNewsData(widget.newsType),
+          future: fetchNewsData(),
           builder: (context, snapshot) {
             return snapshot.data != null
                 ? listViewWidget(snapshot.data)
                 : Center(child: CircularProgressIndicator());
           }),
+      bottomNavigationBar: Footer(),
       );
   }
 
@@ -46,7 +47,7 @@ class _NewsListScreenState extends State<NewsListScreen> {
       child: ListView.builder(
           itemCount: 20,
           padding: const EdgeInsets.all(2.0),
-          itemBuilder: (context, position) {
+          itemBuilder: (BuildContext context, int position) {
             return Card(
               child: ListTile(
                 title: Text(
@@ -68,12 +69,12 @@ class _NewsListScreenState extends State<NewsListScreen> {
                     width: 100.0,
                   ),
                 ),
+                  trailing: _favoriteIconButton(context, position),
                 onTap: () {
                   print(article[position].url);
                   Navigator.push(
                     context,
-                    MaterialPageRoute(
-                        builder: (context) => WebViewScreen(url: article[position].url)),
+                    MaterialPageRoute(builder: (context) => WebViewScreen(url: article[position].url)),
                   );
                 },
               ),
@@ -82,44 +83,31 @@ class _NewsListScreenState extends State<NewsListScreen> {
     );
   }
 
-
-}
-
-class NewsDataList {
-
-  final String title;
-  final String url;
-  final String urlToImage;
-
-  NewsDataList({this.title, this.url, this.urlToImage});
-
-  factory NewsDataList.fromJson(Map<String, dynamic> json) {
-    return NewsDataList(
-      title: json['title'] as String,
-      url: json['url'] as String,
-      urlToImage: json['urlToImage'] as String,
+  IconButton _favoriteIconButton( BuildContext context, int position, {IconData iconData}){
+    print('_isFavorite on favoButton function is $_isFavorite');
+    print('position is $position');
+    return(
+      IconButton(
+        icon: Icon(
+          _isFavorite[position] == true ? Icons.favorite : Icons.favorite_border,
+          color: _isFavorite[position] == true ? Colors.red : null,
+        ),
+        onPressed: (){
+          setState(() {
+            if(_isFavorite[position] == false) {
+              _isFavorite[position] = true;
+            } else {
+              _isFavorite[position] = false;
+            }
+          });
+        },
+      )
     );
   }
-}
 
-
-Future<List<NewsDataList>> fetchNewsData(String newsType) async {
-
-  List<NewsDataList> list;
-  String url = "http://newsapi.org/v2/top-headlines?country=jp&category=technology&apiKey=f289d460a5f94d4087d54cd187becceb";
-  var res = await http.get(Uri.encodeFull(url), headers: {"Accept": "application/json"});
-
-  print(res.body);
-
-  if(res.statusCode == 200){
-    var data = json.decode(res.body);
-    var rest = data["articles"] as List;
-    print(rest);
-    list = rest.map<NewsDataList>((json) => NewsDataList.fromJson(json)).toList();
-    return list;
-  } else {
-    throw Exception('Failed to load album');
   }
-}
+
+
+
 
 

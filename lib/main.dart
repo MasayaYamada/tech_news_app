@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:technewsfeeder/favorite_screen.dart';
 import 'package:technewsfeeder/newslist_screen.dart';
 import 'package:technewsfeeder/webview_screen.dart';
 
@@ -19,6 +20,7 @@ class TechNewsFeeder extends StatelessWidget {
       routes: {
         NewsListScreen.id: (context) => NewsListScreen(),
         WebViewScreen.id: (context) => WebViewScreen(),
+        FavoriteScreen.id: (context) => FavoriteScreen(),
       },
     );
   }
